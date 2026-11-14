@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Conexión de TikTok · NANWES Social Hub</title>
+<style>
+  :root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#29133f;background:#f7f2fd}
+  *{box-sizing:border-box}body{margin:0;padding:40px 20px;min-height:100vh;display:grid;place-items:center}
+  main{max-width:550px;padding:36px;background:white;border:1px solid #e3d8f3;border-radius:18px;box-shadow:0 10px 40px #35114b18}
+  h1{font-size:1.65rem;margin:0 0 12px}p{line-height:1.65;color:#554865}a{color:#6424b3}
+  .tag{color:#6f27b7;font-weight:800;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<main>
+<p class="tag">NANWES Social Hub</p>
+<h1>Conexión de TikTok</h1>
+<p id="status">Esta dirección está reservada para el retorno de autorización de TikTok.</p>
+<p>La integración de TikTok todavía está en desarrollo. Esta página no conecta una cuenta por sí sola y no publica contenido.</p>
+<p><a href="../">Volver a NANWES Social Hub</a></p>
+</main>
+<script>
+(function () {
+  // Never display, transmit or store OAuth codes or state in this static page.
+  const search = new URLSearchParams(window.location.search);
+  const wasCallback = search.has('code') || search.has('error') || search.has('state');
+  if (wasCallback) {
+    history.replaceState(null, '', window.location.pathname);
+    const status = document.getElementById('status');
+    status.textContent = 'TikTok volvió a esta dirección. Aún falta integrar el intercambio seguro del código y verificar el estado OAuth en el servidor de NANWES Social Hub. No consideres la cuenta conectada.';
+  }
+})();
+</script>
+</body>
+</html>
