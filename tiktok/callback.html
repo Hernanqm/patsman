@@ -1,38 +1,33 @@
 <!doctype html>
 <html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
-<meta name="referrer" content="no-referrer">
-<title>Conexión de TikTok · NANWES Social Hub</title>
-<style>
-  :root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#29133f;background:#f7f2fd}
-  *{box-sizing:border-box}body{margin:0;padding:40px 20px;min-height:100vh;display:grid;place-items:center}
-  main{max-width:550px;padding:36px;background:white;border:1px solid #e3d8f3;border-radius:18px;box-shadow:0 10px 40px #35114b18}
-  h1{font-size:1.65rem;margin:0 0 12px}p{line-height:1.65;color:#554865}a{color:#6424b3}
-  .tag{color:#6f27b7;font-weight:800;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
-</style>
-</head>
-<body>
-<main>
-<p class="tag">NANWES Social Hub</p>
-<h1>Conexión de TikTok</h1>
-<p id="status">Esta dirección está reservada para el retorno de autorización de TikTok.</p>
-<p>La integración de TikTok todavía está en desarrollo. Esta página no conecta una cuenta por sí sola y no publica contenido.</p>
-<p><a href="../">Volver a NANWES Social Hub</a></p>
-</main>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>Autorización TikTok — NANWES Social Hub</title>
+<style>body{margin:0;background:#f5f1fb;color:#251533;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;display:grid;place-items:center;min-height:100vh;padding:18px}main{background:white;border-radius:16px;padding:32px;max-width:580px;width:100%;box-shadow:0 15px 40px #35104b1c}h1{margin:0 0 12px}p{line-height:1.6;color:#55495f}small{color:#766b7b}</style>
+</head><body>
+<main><h1>Conexión de TikTok</h1><p id="status">Comprobando autorización…</p><small>No escribas contraseñas ni tokens en esta página.</small></main>
 <script>
-(function () {
-  // Never display, transmit or store OAuth codes or state in this static page.
-  const search = new URLSearchParams(window.location.search);
-  const wasCallback = search.has('code') || search.has('error') || search.has('state');
-  if (wasCallback) {
-    history.replaceState(null, '', window.location.pathname);
-    const status = document.getElementById('status');
-    status.textContent = 'TikTok volvió a esta dirección. Aún falta integrar el intercambio seguro del código y verificar el estado OAuth en el servidor de NANWES Social Hub. No consideres la cuenta conectada.';
+(async function(){
+  const status=document.getElementById('status');
+  const p=new URLSearchParams(location.search);
+  const state=p.get('state')||'',code=p.get('code')||'',error=p.get('error')||'';
+  history.replaceState(null,document.title,location.pathname);
+  if(!state || (!code && !error)){status.textContent='No se recibió una autorización de TikTok. Regresa al panel NANWES Social Hub.';return;}
+  let url='';
+  try {
+    const response=await fetch('./config.json',{cache:'no-store'});
+    if(!response.ok)throw new Error('La configuración no está disponible');
+    const config=await response.json();url=String(config.webapp_url||'');
+  }catch(err){status.textContent='La conexión a Apps Script está pendiente de configurar. Regresa al panel NANWES Social Hub.';return;}
+  if(!/^https:\/\/script\.google\.com\/(?:macros\/|a\/macros\/[^/]+\/)s\/[A-Za-z0-9_-]+\/exec$/.test(url)){
+    status.textContent='No se ha configurado todavía una dirección válida de Apps Script.';return;
   }
+  status.textContent='TikTok autorizó el retorno. Finalizando de manera segura en Apps Script…';
+  const form=document.createElement('form');form.method='POST';form.action=url;form.style.display='none';
+  for(const [name,value] of Object.entries({tiktok_oauth:'1',state,code,error})){
+    const input=document.createElement('input');input.type='hidden';input.name=name;input.value=value;form.append(input);
+  }
+  document.body.append(form);form.submit();
 })();
 </script>
-</body>
-</html>
+</body></html>
